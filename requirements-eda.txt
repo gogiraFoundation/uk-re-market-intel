@@ -1,0 +1,6 @@
+# EDA-only dependencies (in addition to requirements-dq.txt).
+matplotlib>=3.8
+seaborn>=0.13
+scipy>=1.13
+scikit-learn>=1.4
+rapidfuzz>=3.9

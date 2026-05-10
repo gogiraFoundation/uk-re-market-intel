@@ -1,0 +1,135 @@
+# Per-dataset schema contract.
+#
+# Each entry binds a (workbook, sheet) pair from the source data to the
+# minimum schema the DQ pipeline must produce.  The pipeline raises a
+# ``schema_contract_violation`` issue (severity = high) for every breach;
+# downstream consumers can rely on these guarantees.
+#
+# Field reference:
+#   workbook         basename of the source file (extension included).
+#   sheet            sheet name AFTER snake_case normalisation (matches the
+#                    parquet stem suffix in cleaned_data/<publisher>/).
+#   required_columns columns that MUST exist in the cleaned output.
+#   min_rows         lower-bound on the data block size after metadata strip.
+#   max_null_pct     overall null-cell share ceiling (whole sheet).
+#   numeric_columns  optional per-column [min, max] sanity bounds.
+
+datasets:
+
+  - workbook: IRENA_Statistics_Extract_2025H2.xlsx
+    sheet: Country
+    publisher: IRENA
+    required_columns:
+      - region
+      - sub_region
+      - country
+      - iso3_code
+      - year
+      - technology
+      - electricity_installed_capacity_mw
+      - electricity_generation_gwh
+    min_rows: 80000
+    max_null_pct: 60
+    numeric_columns:
+      year: { min: 1990, max: 2030 }
+      electricity_installed_capacity_mw: { min: 0, max: 5_000_000, unit: MW }
+      electricity_generation_gwh: { min: -100, max: 50_000_000, unit: GWh }
+
+  - workbook: IRENA_Statistics_Extract_2025H2.xlsx
+    sheet: Pivot
+    publisher: IRENA
+    required_columns:
+      - region
+      - country
+      - year
+      - technology
+    min_rows: 80000
+    max_null_pct: 60
+
+  - workbook: IRENA_Statistics_Extract_2025H2.xlsx
+    sheet: Region
+    publisher: IRENA
+    # The Region sheet only carries `group_technology` (no `sub_technology`),
+    # unlike the Country sheet which carries both.
+    required_columns: [region, year, group_technology]
+    min_rows: 1000
+    max_null_pct: 60
+
+  - workbook: IRENA_Statistics_Extract_2025H2.xlsx
+    sheet: Global
+    publisher: IRENA
+    required_columns: [year, group_technology]
+    min_rows: 200
+    max_null_pct: 60
+
+  - workbook: IRENA_statistics_extract_2026H1.xlsx
+    sheet: 2026_H1_extract
+    publisher: IRENA
+    required_columns:
+      - region_area_iso_3
+      - region_area
+      - year
+      - data_type
+      - product_name
+      - unit
+      - value
+    min_rows: 80000
+    max_null_pct: 50
+    numeric_columns:
+      year: { min: 1990, max: 2030 }
+      value: { min: -1000, max: 5_000_000, unit: MW }
+
+  - workbook: lcreedataset2024.xlsx
+    sheet: LCREE_TO_by_industry
+    publisher: ONS
+    required_columns: [column, column_2]
+    min_rows: 100
+    max_null_pct: 40
+
+  - workbook: lcreedataset2024.xlsx
+    sheet: LCREE_FTE_by_industry
+    publisher: ONS
+    required_columns: [column, column_2]
+    min_rows: 100
+    max_null_pct: 40
+
+  - workbook: lcreedataset2024.xlsx
+    sheet: LCREE_sector_country
+    publisher: ONS
+    required_columns: [column, column_2]
+    min_rows: 100
+    max_null_pct: 40
+
+  - workbook: Annual_and_quarterly_load_factors_FIT_years_2-15.xlsx
+    sheet: Annual_regional_load_factors
+    publisher: DESNZ
+    # Column is named `financial_year` after snake_case normalisation —
+    # not `year` — because the FIT publication uses fiscal-year buckets.
+    required_columns: [financial_year, technology]
+    min_rows: 50
+    max_null_pct: 30
+
+  - workbook: approved-renewable-heati.xls
+    sheet: Ark1
+    publisher: Ofgem
+    min_rows: 100
+    max_null_pct: 30
+
+  - workbook: 10energyconsumptionheat.xlsx
+    sheet: Heat
+    publisher: ONS
+    required_columns:
+      - year
+      - heat_energy_from_renewable_sources
+    min_rows: 30
+    max_null_pct: 50
+
+  - workbook: 15energyconsumptionbyindustry.xlsx
+    sheet: Energy_consumption_2023_PJ
+    publisher: ONS
+    required_columns:
+      - industry_name
+      - manufacturing
+      - total_energy_consumption_of_primary_fuels_and_equivalents
+    min_rows: 30
+    max_null_pct: 50

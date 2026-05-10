@@ -1,0 +1,4 @@
+# Aggregated runtime dependencies (DQ + EDA + Streamlit app).
+-r requirements-dq.txt
+-r requirements-eda.txt
+-r requirements-app.txt
