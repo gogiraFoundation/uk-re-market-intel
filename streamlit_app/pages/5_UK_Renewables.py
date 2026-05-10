@@ -63,11 +63,19 @@ else:
     else:
         c1, c2 = st.columns(2)
         with c1:
-            fig2 = px.scatter(
-                plot, x="year", y="capacity_factor_calc", color="technology",
-                trendline="lowess", trendline_options=dict(frac=0.5),
-                labels={"capacity_factor_calc": "Capacity factor (computed)"},
-            )
+            # LOWESS trendlines require statsmodels (plotly.express); keep fallback.
+            try:
+                fig2 = px.scatter(
+                    plot, x="year", y="capacity_factor_calc", color="technology",
+                    trendline="lowess", trendline_options=dict(frac=0.5),
+                    labels={"capacity_factor_calc": "Capacity factor (computed)"},
+                )
+            except (ImportError, ModuleNotFoundError):
+                fig2 = px.scatter(
+                    plot, x="year", y="capacity_factor_calc", color="technology",
+                    labels={"capacity_factor_calc": "Capacity factor (computed)"},
+                )
+                st.caption("LOWESS trendline omitted (install `statsmodels` for smooth trends).")
             fig2.update_layout(height=420)
             st.plotly_chart(fig2, width="stretch")
         with c2:
