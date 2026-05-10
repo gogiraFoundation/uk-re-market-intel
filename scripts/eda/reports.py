@@ -11,6 +11,7 @@ from ._io import Sheet
 
 
 def _md_table(df: pd.DataFrame, max_rows: int = 25, fmt: dict | None = None) -> str:
+    """GitHub-flavoured markdown table without ``tabulate`` (optional pandas extra)."""
     if df is None or df.empty:
         return "_no rows_"
     sub = df.head(max_rows).copy()
@@ -19,7 +20,17 @@ def _md_table(df: pd.DataFrame, max_rows: int = 25, fmt: dict | None = None) -> 
             if c in sub.columns:
                 sub[c] = sub[c].apply(lambda v: f.format(v) if pd.notna(v) else "")
     sub = sub.fillna("")
-    return sub.to_markdown(index=False)
+    cols = list(sub.columns)
+
+    def esc(cell: object) -> str:
+        return str(cell).replace("|", "\\|").replace("\n", " ")
+
+    header = "| " + " | ".join(esc(c) for c in cols) + " |"
+    sep = "| " + " | ".join("---" for _ in cols) + " |"
+    lines = [header, sep]
+    for _, row in sub.iterrows():
+        lines.append("| " + " | ".join(esc(row[c]) for c in cols) + " |")
+    return "\n".join(lines)
 
 
 def _link_artifact(run_dir: Path, rel: str) -> str:
