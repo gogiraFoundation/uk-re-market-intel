@@ -113,6 +113,8 @@ Run from repo root so paths resolve as expected, or pass absolute paths.
 streamlit run streamlit_app/Home.py
 ```
 
+Equivalent from the repo root (same app): `streamlit run Home.py`. The root [`Home.py`](Home.py) and [`pages`](pages) entries are **symlinks** into [`streamlit_app/`](streamlit_app/) so hosts such as **Streamlit Community Cloud** can use a main file path of **`Home.py`** at the repository root next to a top-level **`pages/`** directory.
+
 The app discovers the latest DQ and EDA runs and lists cleaned sheets from `cleaned_data/`. Pages include inventory, sheet explorer, IRENA views, drift, UK renewables, LCREE productivity, data quality, an integrated UK transition brief, and ECUK heat / reconciliation.
 
 ## Outputs
