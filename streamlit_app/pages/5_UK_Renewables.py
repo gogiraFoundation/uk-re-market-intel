@@ -63,19 +63,15 @@ else:
     else:
         c1, c2 = st.columns(2)
         with c1:
-            # LOWESS trendlines require statsmodels (plotly.express); keep fallback.
-            try:
-                fig2 = px.scatter(
-                    plot, x="year", y="capacity_factor_calc", color="technology",
-                    trendline="lowess", trendline_options=dict(frac=0.5),
-                    labels={"capacity_factor_calc": "Capacity factor (computed)"},
-                )
-            except (ImportError, ModuleNotFoundError):
-                fig2 = px.scatter(
-                    plot, x="year", y="capacity_factor_calc", color="technology",
-                    labels={"capacity_factor_calc": "Capacity factor (computed)"},
-                )
-                st.caption("LOWESS trendline omitted (install `statsmodels` for smooth trends).")
+            # Rolling mean trendline uses pandas only (LOWESS/OLS need statsmodels, often
+            # missing on Py 3.14 / slim Cloud images).
+            fig2 = px.scatter(
+                plot.sort_values("year"),
+                x="year", y="capacity_factor_calc", color="technology",
+                trendline="rolling",
+                trendline_options=dict(window=3, function="mean"),
+                labels={"capacity_factor_calc": "Capacity factor (computed)"},
+            )
             fig2.update_layout(height=420)
             st.plotly_chart(fig2, width="stretch")
         with c2:
