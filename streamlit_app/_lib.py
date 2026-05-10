@@ -172,3 +172,15 @@ def style_dataframe(df: pd.DataFrame, max_rows: int = 1000) -> pd.DataFrame:
     cap row count for responsiveness."""
     keep = data_columns(df)
     return df[keep].head(max_rows)
+
+
+def _maybe_run_deploy_pipelines() -> None:
+    """On Streamlit Community Cloud, ``cleaned_data/`` is absent until pipelines run."""
+    from pipeline_bootstrap import ensure_sync_bootstrap
+
+    ran = ensure_sync_bootstrap(REPO_ROOT)
+    if ran:
+        st.cache_data.clear()
+
+
+_maybe_run_deploy_pipelines()

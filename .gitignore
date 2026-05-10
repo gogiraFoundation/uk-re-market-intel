@@ -1,4 +1,5 @@
 .DS_Store
+.pipeline_bootstrap.lock
 .coverage
 coverage.xml
 .pytest_cache/
