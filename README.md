@@ -115,7 +115,7 @@ streamlit run streamlit_app/Home.py
 
 Equivalent from the repo root (same app): `streamlit run Home.py`. The root [`Home.py`](Home.py) and [`pages`](pages) entries are **symlinks** into [`streamlit_app/`](streamlit_app/) so hosts such as **Streamlit Community Cloud** can use a main file path of **`Home.py`** at the repository root next to a top-level **`pages/`** directory.
 
-**Streamlit Community Cloud — automatic pipelines:** On a fresh deploy there is no `cleaned_data/` (it is not committed). Importing [`streamlit_app/_lib.py`](streamlit_app/_lib.py) (used by every page) runs [`streamlit_app/pipeline_bootstrap.py`](streamlit_app/pipeline_bootstrap.py) once: **data quality** → **EDA** → **derived facts**, in that order, via the same CLIs as locally. A lock file avoids duplicate runs across workers. The first visitor may wait several minutes; check **Streamlit / GitHub logs** for `[pipeline_bootstrap]` lines.
+**Streamlit Community Cloud — automatic pipelines:** On a fresh deploy there is no `cleaned_data/` (it is not committed). Importing [`streamlit_app/_lib.py`](streamlit_app/_lib.py) (used by every page) runs [`streamlit_app/pipeline_bootstrap.py`](streamlit_app/pipeline_bootstrap.py) once: **data quality** → **EDA** → **derived facts**, in that order, via the same CLIs as locally. Success is recorded as **`cleaned_data/.pipelines_complete`**; partial outputs alone do **not** skip a rerun (so a failed EDA step retries after fixes). A lock file avoids duplicate runs across workers. The first visitor may wait several minutes; check **Streamlit / GitHub logs** for `[pipeline_bootstrap]` lines.
 
 Control via environment variables (e.g. Cloud **Secrets** → `UK_RE_MI_SKIP_BOOTSTRAP`, or shell):
 

@@ -29,18 +29,15 @@ def _force_env() -> bool:
 
 
 def _pipelines_complete(repo_root: Path) -> bool:
+    """True only when all bootstrap steps finished successfully (marker written).
+
+    Do not infer completion from partial ``cleaned_data/`` alone — otherwise a failed
+    ``run_eda.py`` after a successful DQ pass would never retry.
+    """
     if _skip_env():
         return True
     marker = repo_root / "cleaned_data" / MARKER_NAME
-    if marker.is_file():
-        return True
-    cleaned = repo_root / "cleaned_data"
-    if cleaned.is_dir():
-        for child in cleaned.iterdir():
-            if child.is_dir() and child.name != "derived":
-                if any(child.glob("*.parquet")):
-                    return True
-    return False
+    return marker.is_file()
 
 
 def _run_pipeline_steps(repo_root: Path) -> None:
